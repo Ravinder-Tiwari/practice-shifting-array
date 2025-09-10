@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <title>Step-by-Step Array Shift</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      text-align: center;
+      margin-top: 40px;
+      /* background: #0b110c; */
+      color: white;
+      background: linear-gradient(135deg, #0f2027, #203a43, #2c5364);
+    }
+
+
+    .array {
+      display: flex;
+      justify-content: center;
+      margin: 20px;
+    }
+
+    .box {
+      width: 60px;
+      height: 60px;
+      margin: 5px;
+      background: #4caf50;
+      color: white;
+      font-size: 20px;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      border-radius: 8px;
+      transition: transform 0.4s ease;
+    }
+
+    button {
+      padding: 10px 20px;
+      margin: 10px;
+      font-size: 16px;
+      cursor: pointer;
+      border: none;
+      border-radius: 0.4rem;
+      background: #4caf50;
+      color: white;
+      transition: all 0.8ms ease-in;
+    }
+
+    @keyframes clickEffect {
+      0% {
+        background: #4caf50;
+        transform: scale(1);
+      }
+
+      50% {
+        background: #fcc900;
+        transform: scale(0.85);
+      }
+
+      100% {
+        background: #4caf50;
+        transform: scale(1);
+      }
+    }
+
+    button.clicked {
+      animation: clickEffect 0.6s ease;
+    }
+
+    button:nth-of-type(3) {
+      background: #2196F3;
+    }
+
+    input {
+      border: none;
+      padding: 6px;
+      border-radius: 0.4rem;
+      background: #6e3fdb;
+      color: white;
+    }
+
+    .highlight {
+      background: #2196F3 !important;
+    }
+  </style>
+</head>
+
+<body>
+  <h2>Step-by-Step Array Shift (Animated Swaps)</h2>
+  <div class="array" id="arrayContainer"></div>
+  <label>Shift by (k): </label>
+  <input id="kInput" type="number" value="1" min="1" max="10"><br><br>
+  <button onclick="startShift('right',event)">Right Shift</button>
+  <button onclick="startShift('left',event)">Left Shift</button>
+  <button onclick="resetArr(event)">Reset</button>
+
+  <script>
+    const original = [1, 2, 3, 4, 5]; let arr = [...original];
+    const render = () => { document.getElementById("arrayContainer").innerHTML = arr.map((n, i) => `<div class="box" data-index="${i}">${n}</div>`).join("") };
+    const delay = ms => new Promise(r => setTimeout(r, ms));
+    async function animateSwap(i, j) {
+      const b = document.querySelectorAll(".box"), [box1, box2] = [b[i], b[j]], dist = 70 * (j - i);
+      box1.classList.add("highlight"); box2.classList.add("highlight");
+      box1.style.transform = `translateX(${dist}px)`; box2.style.transform = `translateX(${-dist}px)`;
+      await delay(400);
+      box1.style.transform = box2.style.transform = ""; box1.classList.remove("highlight"); box2.classList.remove("highlight");
+      [arr[i], arr[j]] = [arr[j], arr[i]]; render(); await delay(100);
+    }
+    async function shiftByOne(dir) {
+      if (dir === "right") { for (let i = arr.length - 1; i > 0; i--) await animateSwap(i, i - 1); }
+      else { for (let i = 0; i < arr.length - 1; i++) await animateSwap(i, i + 1); }
+    }
+    function highlightButton(btn) { btn.classList.add("clicked"); setTimeout(() => btn.classList.remove("clicked"), 600); }
+    async function startShift(dir, e) {
+      highlightButton(e.target); let k = parseInt(document.getElementById("kInput").value);
+      for (let step = 0; step < k; step++) await shiftByOne(dir);
+    }
+    function resetArr(e) { highlightButton(e.target); arr = [...original]; render(); }
+    render();
+  </script>
+</body>
+
+</html>
